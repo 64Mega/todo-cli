@@ -124,7 +124,7 @@ std::vector<std::string> get_todos(bool local_mode)  {
 void read_todos(bool local_mode) {
     auto buffer = get_todos(local_mode);
     if(buffer.size() == 0) {
-        printf("No todos added yet!\n");
+        printf("Nothing to do!\n");
         return;
     }
     for(int i = 0; i < buffer.size(); i++) {
