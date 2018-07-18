@@ -15,6 +15,8 @@
     #define SEPARATOR "/"
 #endif
 
+#define VERSION "0.0.1d"
+
 #define PATHMAX 4096
 
 FILE* todo_handle;
@@ -62,6 +64,8 @@ void usage() {
     printf("sweep          - Clear all completed todos from the list\n");
     printf("delete <num>   - Remove a todo from the list\n");
     printf("purge          - Removed ALL TODOS from the list\n");
+    printf("help           - Display this list\n");
+    printf("version        - Show version information");
 }
 
 char* get_userdir() {
@@ -247,7 +251,7 @@ void process_todos(std::queue<std::string>* command_list, bool local_mode) {
     }
     
     std::string command = command_list->front();
-    // std::transform(command.begin(), command.end(), command.begin(), ::tolower);    
+    std::transform(command.begin(), command.end(), command.begin(), ::tolower);    
     command_list->pop();
 
     if(command == "global") {
@@ -289,6 +293,10 @@ void process_todos(std::queue<std::string>* command_list, bool local_mode) {
     } else 
     if(command == "purge") {
         purge_todos(local);
+    } else
+    if(command == "version") {
+        printf("Running version %s\n", VERSION);
+        while(!command_list->empty()) { command_list->pop(); }
     } else
     if(command == "help") {
         while(!command_list->empty()) { command_list->pop(); }
