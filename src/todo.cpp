@@ -99,6 +99,14 @@ char* get_userdir() {
     return path;
 }
 
+// Checks if the first char of each string match, for command shorthand checks.
+bool match_one_or_more(std::string input, std::string compare) {
+    if(input.length() > 0 && compare.length() > 0) {
+        return input[0] == compare[0];
+    }
+    return false;
+}
+
 // Create a .todo file or re-initialize an existing one.
 // If is_local is true, it creates the file in the current working directory, otherwise
 // it creates it in the user folder.
@@ -305,23 +313,23 @@ void process_todos(std::queue<std::string>* command_list, bool local_mode) {
     // Pretty straightforward state-changes where necessary. Some of the functions "eat" the remainder
     // of the command inputs (if any) to make sure there aren't multiple triggerings of, for instance,
     // the usage() function.
-    if(command == "global") {
+    if(match_one_or_more(command, "global")) {
         local = false;        
         if(command_list->empty()) {
             read_todos(local);
         }
     } else
-    if(command == "init") {
+    if(match_one_or_more(command, "init")) {
         todo_init(local);
     } else 
-    if(command == "add") {
+    if(match_one_or_more(command, "add")) {
         if(command_list->empty()) {
             printf("No todo to add!\n");
         } else {
             write_todo(concat_remainder(command_list), local);
         }
     } else
-    if(command == "complete") {
+    if(match_one_or_more(command, "complete")) {
         if(command_list->empty()) {
             printf("You need to pass in a todo ID to complete!\n");            
         } else {
@@ -330,10 +338,10 @@ void process_todos(std::queue<std::string>* command_list, bool local_mode) {
             complete_todo(idx, local);
         }
     } else
-    if(command == "sweep") {
+    if(match_one_or_more(command, "sweep")) {
         sweep_todos(local);
     } else
-    if(command == "delete") {
+    if(match_one_or_more(command, "delete")) {
         if(command_list->empty()) {
             printf("You need to pass in a todo ID to delete!\n");            
         } else {
@@ -342,14 +350,14 @@ void process_todos(std::queue<std::string>* command_list, bool local_mode) {
             delete_todo(idx, local);
         }
     } else 
-    if(command == "purge") {
+    if(match_one_or_more(command, "purge")) {
         purge_todos(local);
     } else
-    if(command == "version") {
+    if(match_one_or_more(command, "version")) {
         printf("Running version %s\n", VERSION);
         while(!command_list->empty()) { command_list->pop(); }
     } else
-    if(command == "help") {
+    if(match_one_or_more(command, "help")) {
         while(!command_list->empty()) { command_list->pop(); }
         usage();
     } else {
