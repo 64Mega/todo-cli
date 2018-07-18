@@ -25,6 +25,14 @@ E.G: `todo add This won't work` will cause Powershell to keep seeking input unti
 
 To get around this, just quote text like so: `todo add "Now it'll work"`
 
+Shorthand can be used for any command. For example:
+`todo g a My task message` to add a global entry.
+
+## Changelog
+### Version 0.0.2a
++ Allow command shorthand
++ Change Makefile to compile without debug info by default
+
 ## Global Mode
 In addition to running in local directories, `todo` can also run at the user level in both Windows and Linux environments.
 

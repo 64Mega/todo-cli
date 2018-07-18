@@ -1,6 +1,6 @@
 CC=g++
 LDFLAGS=
-CFLAGS=-std=c++14 -g -O0
+CFLAGS=-std=c++14 -O3
 
 OUTPUT=todo
 
