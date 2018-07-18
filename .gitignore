@@ -1,4 +1,5 @@
 .todo
+todo
 *.exe
 *.o
 .vscode
