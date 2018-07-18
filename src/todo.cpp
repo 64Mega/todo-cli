@@ -15,7 +15,7 @@
     #define SEPARATOR "/"
 #endif
 
-#define VERSION "0.0.1d"
+#define VERSION "0.0.1e"
 
 #define PATHMAX 4096
 
@@ -65,7 +65,7 @@ void usage() {
     printf("delete <num>   - Remove a todo from the list\n");
     printf("purge          - Removed ALL TODOS from the list\n");
     printf("help           - Display this list\n");
-    printf("version        - Show version information");
+    printf("version        - Show version information\n");
 }
 
 char* get_userdir() {
@@ -113,11 +113,11 @@ std::vector<std::string> get_todos(bool local_mode)  {
                 break;
             }
         } while(true);
+        fclose(fp);
     } else {
         usage();        
-    }
-
-    fclose(fp);
+    }    
+    
     return buffer;
 }
 
