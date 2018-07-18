@@ -43,9 +43,7 @@ int main(int argc, char** argv) {
     } else {
         process_todos(commands, true);
     }
-    delete commands;        
-
-    printf("\n");
+    delete commands;            
 
     return(0);
 }
@@ -223,7 +221,7 @@ void sweep_todos(bool local) {
     }
     
     rewrite_todos(todos, local);
-    printf("Removed %d completed todos from the list!\n", count);
+    printf("Removed %d completed todo%s from the list!\n", count, count > 1 ? "s" : "");
 }
 
 void purge_todos(bool local) {
@@ -237,7 +235,7 @@ void purge_todos(bool local) {
     }
     
     rewrite_todos(todos, local);
-    printf("Removed %d completed todos from the list!\n", count);
+    printf("Removed %d todo%s from the list!\n", count, count > 1 ? "s" : "");
 }
 
 void process_todos(std::queue<std::string>* command_list, bool local_mode) {
