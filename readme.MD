@@ -41,18 +41,16 @@ For example:
 ## Dependencies
 A working C++ compiler.
 
-## Building on Windows
+## Building
 With any GCC-based toolchain installed, run your `make` command (`make` or `mingw32-make`) in the cloned project directory.
 
-Feel free to add the resulting binary to your `PATH` variable for easier usage.
+It _should_ work out-of-the-box on any system that can run standard C++/C code, it doesn't use anything fancy.
 
-## Building on Linux
-Tested, compiles on Linux.
-Just run `make`, assuming you have GCC installed.
-
-## Building on WSL
-Same as Linux, also tested to be working.
-
+Tested on:
+ + Windows 10
+ + Windows 10 (WSL, Ubuntu)
+ + Manjaro Linux 17.1.11 (Arch Linux)
+ + Mac OS High Sierra (10.13)
 ## Code Notes
 The code is messy, this is the result of a spontaneous one-night self-challenge!
 
