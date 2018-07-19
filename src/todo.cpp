@@ -31,13 +31,22 @@
     #define ccout std::wcout
 
     // Glyph definitions for Windows. Windows wants a wchar_t* for UTF-16 output
-    const wchar_t* GLYPH_COMPLETE = L"\U00002705";
-    const wchar_t* GLYPH_INCOMPLETE = L" ";
+    #ifdef UNICODEGLYPHS
+        const wchar_t* GLYPH_COMPLETE = L"\U00002705";
+        const wchar_t* GLYPH_INCOMPLETE = L" ";
+    #else
+        const wchar_t* GLYPH_COMPLETE = L"[X]";
+        const wchar_t* GLYPH_INCOMPLETE = L"[ ]";
+    #endif
 
     void init() {
-        // Set up better console output
-        _setmode(_fileno(stdout), _O_U16TEXT);
-        std::cout << "Test?" << std::endl;
+        #ifdef UNICODEGLYPHS
+            // Set up better console output
+            // Note that this is generally unsupported, but works on all versions of Windows since XP.
+            // If it ever fails in the future, remove this line and set the glyphs above to something
+            // within the standard ASCII set.
+            _setmode(_fileno(stdout), _O_U16TEXT);        
+        #endif
     }
 #else
     #define HOMEDIR "HOME"
@@ -47,8 +56,13 @@
     #define ccout std::cout
 
     // Glyph definitions for the rest of the world.
-    const char* GLYPH_COMPLETE = "\U00002705";
-    const char* GLYPH_INCOMPLETE = " ";
+    #ifdef UNICODEGLYPHS
+        const char* GLYPH_COMPLETE = "\U00002705";
+        const char* GLYPH_INCOMPLETE = " ";
+    #else
+        const char* GLYPH_COMPLETE = "[Completed]";
+        const char* GLYPH_INCOMPLETE = " ";
+    #endif
 
     void init() {
         // No specific setup required
