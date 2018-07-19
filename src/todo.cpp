@@ -60,7 +60,7 @@
         const char* GLYPH_COMPLETE = "\U00002705";
         const char* GLYPH_INCOMPLETE = " ";
     #else
-        const char* GLYPH_COMPLETE = "[Completed]";
+        const char* GLYPH_COMPLETE = "[X]";
         const char* GLYPH_INCOMPLETE = " ";
     #endif
 

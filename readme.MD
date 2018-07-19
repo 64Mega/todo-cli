@@ -29,6 +29,10 @@ Shorthand can be used for any command. For example:
 `todo g a My task message` to add a global entry.
 
 ## Changelog
+### Version 0.0.3
++ Refactored most output to utilize Unicode if necessary.
++ Compile-flag to use ✅ for completed tasks.
+
 ### Version 0.0.2a
 + Allow command shorthand
 + Change Makefile to compile without debug info by default
@@ -52,6 +56,8 @@ A working C++ compiler.
 ## Building
 With any GCC-based toolchain installed, run your `make` command (`make` or `mingw32-make`) in the cloned project directory.
 
+When rebuilding, run `make clean` followed by `make`.
+
 It _should_ work out-of-the-box on any system that can run standard C++/C code, it doesn't use anything fancy.
 
 Tested on:
@@ -59,6 +65,21 @@ Tested on:
  + Windows 10 (WSL, Ubuntu)
  + Manjaro Linux 17.1.11 (Arch Linux)
  + Mac OS High Sierra (10.13)
+
+## Enabling ✅ output for completed tasks
+In the Makefile, uncomment `-DUNICODEGLYPHS` to allow outputting `✅` instead of `[C]` for completed tasks.
+
+Note that this doesn't work out-of-the-box on many terminals, as it requires UTF-8/16 support as well as a font that contains the required codepage and character.
+
+Tested on:
++ ConEmu (With UTF16 mode enabled)
++ Visual Studio Code Terminal
++ Hyper
++ iTerm2 with Powerline fonts
++ ZSH with Powerline fonts
+
+Your mileage may vary.
+
 ## Code Notes
 The code is messy, this is the result of a spontaneous one-night self-challenge!
 
