@@ -69,7 +69,7 @@
     }
 #endif
 
-#define VERSION "0.0.3"
+#define VERSION "0.0.3a"
 
 // Just a guess, trying to keep things 'simple' between Windows and Linux systems. So far it works on both,
 // but if somebody decides to make a project 4096 characters deep and tries running todo and it breaks, feel
