@@ -15,18 +15,47 @@
 #include <algorithm>
 #include <vector>
 #include <queue>
+#include <iostream>
 
 // Note that not all compilers define the __WIN32__ symbol on Windows, but this mostly applies to older
 // and weirder compilers. If you run into compilation issues, just add a define to the Makefile.
 #ifdef __WIN32__    
     #define HOMEDIR "USERPROFILE"
-    #define SEPARATOR "\\"
+    #define SEPARATOR "\\"    
+
+    #include <fcntl.h>
+    #include <io.h>    
+
+    // Windows needs std::wcout for Unicode character output, so I'm cheating by #define-ing the
+    // problem away.
+    #define ccout std::wcout
+
+    // Glyph definitions for Windows. Windows wants a wchar_t* for UTF-16 output
+    const wchar_t* GLYPH_COMPLETE = L"\U00002705";
+    const wchar_t* GLYPH_INCOMPLETE = L" ";
+
+    void init() {
+        // Set up better console output
+        _setmode(_fileno(stdout), _O_U16TEXT);
+        std::cout << "Test?" << std::endl;
+    }
 #else
     #define HOMEDIR "HOME"
     #define SEPARATOR "/"
+
+    // Linux and Mac are fine with a standard std::cout for their Unicode output.
+    #define ccout std::cout
+
+    // Glyph definitions for the rest of the world.
+    const char* GLYPH_COMPLETE = "\U00002705";
+    const char* GLYPH_INCOMPLETE = " ";
+
+    void init() {
+        // No specific setup required
+    }
 #endif
 
-#define VERSION "0.0.2a"
+#define VERSION "0.0.3"
 
 // Just a guess, trying to keep things 'simple' between Windows and Linux systems. So far it works on both,
 // but if somebody decides to make a project 4096 characters deep and tries running todo and it breaks, feel
@@ -44,7 +73,10 @@ void usage();
 // Entrypoint
 
 int main(int argc, char** argv) {
-    // The command look is very simple. Convert arguements into individual std::string components,
+    // Initialize better output for the console if we're on Windows
+    init();
+
+    // The command loop is very simple. Convert arguements into individual std::string components,
     // recursively call process_todos until no commands are left.
 
     std::queue<std::string>* commands = proc_commands(argv, argc);
@@ -71,22 +103,22 @@ std::queue<std::string>* proc_commands(char** argv, int argc) {
 
 // Prints out usage information
 
-void usage() {     
-    printf("todo usage\n");
-    printf("----------\n");
-    printf("Begin with todo init.\n\n");
-    printf("COMMAND          DESCRIPTION\n");
-    printf("-------          -----------\n");
-    printf("init           - Initialize .todo file\n");
-    printf("global <cmd>   - Perform any of these commands on the user-level .todo\n");
-    printf("add <todo>     - Add a new todo\n");
-    printf("<no args>      - Display todos in .todo\n");
-    printf("complete <num> - Complete the given todo\n");
-    printf("sweep          - Clear all completed todos from the list\n");
-    printf("delete <num>   - Remove a todo from the list\n");
-    printf("purge          - Removed ALL TODOS from the list\n");
-    printf("help           - Display this list\n");
-    printf("version        - Show version information\n");
+void usage() {    
+    ccout << "todo usage\n";
+    ccout << "----------\n";
+    ccout << "Begin with todo init.\n\n";
+    ccout << "COMMAND          DESCRIPTION\n";
+    ccout << "-------          -----------\n";
+    ccout << "init           - Initialize .todo file\n";
+    ccout << "global <cmd>   - Perform any of these commands on the user-level .todo\n";
+    ccout << "add <todo>     - Add a new todo\n";
+    ccout << "<no args>      - Display todos in .todo\n";
+    ccout << "complete <num> - Complete the given todo\n";
+    ccout << "sweep          - Clear all completed todos from the list\n";
+    ccout << "delete <num>   - Remove a todo from the list\n";
+    ccout << "purge          - Removed ALL TODOS from the list\n";
+    ccout << "help           - Display this list\n";
+    ccout << "version        - Show version information\n";
 }
 
 // Gets the current user directory for global mode.
@@ -122,10 +154,10 @@ void todo_init(bool is_local) {
 
     FILE* fp = fopen(path, "w");
     if(fp) {
-        printf("Created %s\n", path);
+        ccout << "Created " << path << std::endl;
         fclose(fp);
     } else {
-        printf("Error creating %s\n", path);
+        ccout << "Error creating " << path << std::endl;
     }    
 }
 
@@ -165,15 +197,20 @@ std::vector<std::string> get_todos(bool local_mode)  {
 void read_todos(bool local_mode) {
     auto buffer = get_todos(local_mode);
     if(buffer.size() == 0) {
-        printf("Nothing to do!\n");
+        ccout << "Nothing to do!" << std::endl;
         return;
     }
     for(int i = 0; i < buffer.size(); i++) {
         std::string todo = buffer[i];
         if(todo.length() < 2) { continue; }
+        std::replace(todo.begin(), todo.end(), '\n', ' ');
+        std::replace(todo.begin(), todo.end(), '\r', ' ');
         char state = todo[0];
         todo = todo.substr(2);
-        printf("[%2d]%s %s", i, state == 'X' ? "" : "[Complete]", todo.c_str());
+
+        ccout << "[" << i << "] ";
+        ccout << (state == 'X' ? GLYPH_INCOMPLETE : GLYPH_COMPLETE) << "\t";
+        ccout << todo.c_str() << std::endl; 
     }
 }
 
@@ -204,10 +241,10 @@ void write_todo(std::string msg, bool local_mode) {
     if(fp) {
         fseek(fp, 0, SEEK_END);
         fprintf(fp, "X:%s\n", msg.c_str());
-        printf("Added!\n");
+        ccout << "Added!" << std::endl;
         fclose(fp);
     } else {
-        printf("Error adding todo!\n");
+        ccout << "Error adding todo." << std::endl;
     }    
 }
 
@@ -234,7 +271,7 @@ void rewrite_todos(std::vector<std::string> buffer, bool local) {
         }        
         fclose(fp);        
     } else {
-        printf("Error updating todos!\n");
+        ccout << "Error updating todos." << std::endl;
     }    
 }
 
@@ -243,10 +280,10 @@ void rewrite_todos(std::vector<std::string> buffer, bool local) {
 void complete_todo(unsigned int index, bool local) {
     auto todos = get_todos(local);
     if(index > todos.size() - 1) {
-        printf("No such item!\n");
+        ccout << "No item with index " << index << "." << std::endl;
     } else {
         todos[index][0] = 'O';
-        printf("Completed!\n");
+        ccout << "Item " << index << " completed!" << std::endl;
     }
 
     rewrite_todos(todos, local);
@@ -256,10 +293,10 @@ void complete_todo(unsigned int index, bool local) {
 void delete_todo(unsigned int index, bool local) {
     auto todos = get_todos(local);
     if(index > todos.size() - 1) {
-        printf("No such item!\n");
+        ccout << "No item with index " << index << "." << std::endl;
     } else {
         todos[index] = "";
-        printf("Deleted!\n");
+        ccout << "Item " << index << " deleted." << std::endl;
     }
 
     rewrite_todos(todos, local);
@@ -279,7 +316,7 @@ void sweep_todos(bool local) {
     }
     
     rewrite_todos(todos, local);
-    printf("Removed %d completed todo%s from the list!\n", count, count > 1 ? "s" : "");
+    ccout << "Removed " << count << " completed todo" << (count > 1 ? "s" : "") << " from the list!" << std::endl;     
 }
 
 // Removes ALL todos from the list, regardless of state.
@@ -294,7 +331,7 @@ void purge_todos(bool local) {
     }
     
     rewrite_todos(todos, local);
-    printf("Removed %d todo%s from the list!\n", count, count > 1 ? "s" : "");
+    ccout << "Deleted " << count << " todo" << (count > 1 ? "s" : "") << " from the list." << std::endl;     
 }
 
 // Command line processor. Recursive.
@@ -324,14 +361,14 @@ void process_todos(std::queue<std::string>* command_list, bool local_mode) {
     } else 
     if(match_one_or_more(command, "add")) {
         if(command_list->empty()) {
-            printf("No todo to add!\n");
+            ccout << "No todo message provided." << std::endl;
         } else {
             write_todo(concat_remainder(command_list), local);
         }
     } else
     if(match_one_or_more(command, "complete")) {
         if(command_list->empty()) {
-            printf("You need to pass in a todo ID to complete!\n");            
+            ccout << "No todo ID provided." << std::endl;
         } else {
             unsigned int idx = atoi(command_list->front().c_str());
             command_list->pop();
@@ -343,7 +380,7 @@ void process_todos(std::queue<std::string>* command_list, bool local_mode) {
     } else
     if(match_one_or_more(command, "delete")) {
         if(command_list->empty()) {
-            printf("You need to pass in a todo ID to delete!\n");            
+            ccout << "No todo ID provided." << std::endl;          
         } else {
             unsigned int idx = atoi(command_list->front().c_str());
             command_list->pop();
@@ -354,7 +391,7 @@ void process_todos(std::queue<std::string>* command_list, bool local_mode) {
         purge_todos(local);
     } else
     if(match_one_or_more(command, "version")) {
-        printf("Running version %s\n", VERSION);
+        ccout << "todo-cli version " << VERSION << std::endl;       
         while(!command_list->empty()) { command_list->pop(); }
     } else
     if(match_one_or_more(command, "help")) {
