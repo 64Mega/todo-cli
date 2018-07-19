@@ -67,7 +67,7 @@ Tested on:
  + Mac OS High Sierra (10.13)
 
 ## Enabling ✅ output for completed tasks
-In the Makefile, uncomment `-DUNICODEGLYPHS` to allow outputting `✅` instead of `[C]` for completed tasks.
+In the Makefile, uncomment `-DUNICODEGLYPHS` to allow outputting `✅` instead of `[X]` for completed tasks.
 
 Note that this doesn't work out-of-the-box on many terminals, as it requires UTF-8/16 support as well as a font that contains the required codepage and character.
 
