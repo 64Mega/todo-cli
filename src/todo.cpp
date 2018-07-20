@@ -69,7 +69,7 @@
     }
 #endif
 
-#define VERSION "0.0.3a"
+#define VERSION "0.0.3b"
 
 // Just a guess, trying to keep things 'simple' between Windows and Linux systems. So far it works on both,
 // but if somebody decides to make a project 4096 characters deep and tries running todo and it breaks, feel
@@ -148,7 +148,12 @@ char* get_userdir() {
 // Checks if the first char of each string match, for command shorthand checks.
 bool match_one_or_more(std::string input, std::string compare) {
     if(input.length() > 0 && compare.length() > 0) {
-        return input[0] == compare[0];
+        std::string command = compare;
+        if(input.length() < command.length()) {
+            command = command.substr(0, input.length());
+        }
+
+        return input.compare(command) == 0;
     }
     return false;
 }
@@ -413,7 +418,8 @@ void process_todos(std::queue<std::string>* command_list, bool local_mode) {
         usage();
     } else {
         while(!command_list->empty()) { command_list->pop(); }
-        usage();
+        // usage();
+        ccout << "Invalid command. Run 'todo help' for usage information" << std::endl;
     }
     
     process_todos(command_list);    
