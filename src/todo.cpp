@@ -24,7 +24,15 @@
     #define SEPARATOR "\\"    
 
     #include <fcntl.h>
-    #include <io.h>    
+    #include <io.h>
+
+    #ifndef _O_U16TEXT
+        #define _O_U16TEXT 0x00020000
+    #endif
+
+    #ifndef _O_U8TEXT
+        #define _O_U8TEXT 0x00040000
+    #endif
 
     // Windows needs std::wcout for Unicode character output, so I'm cheating by #define-ing the
     // problem away.
@@ -45,7 +53,7 @@
             // Note that this is generally unsupported, but works on all versions of Windows since XP.
             // If it ever fails in the future, remove this line and set the glyphs above to something
             // within the standard ASCII set.
-            _setmode(_fileno(stdout), _O_U16TEXT);        
+            _setmode(_fileno(stdout), _O_U8TEXT);        
         #endif
     }
 #else
@@ -69,7 +77,7 @@
     }
 #endif
 
-#define VERSION "0.0.3b"
+#define VERSION "0.0.4"
 
 // Just a guess, trying to keep things 'simple' between Windows and Linux systems. So far it works on both,
 // but if somebody decides to make a project 4096 characters deep and tries running todo and it breaks, feel
@@ -120,6 +128,7 @@ std::queue<std::string>* proc_commands(char** argv, int argc) {
 void usage() {    
     ccout << "todo usage\n";
     ccout << "----------\n";
+    ccout << "todo <command> [<parameters>]\n";
     ccout << "Begin with todo init.\n\n";
     ccout << "COMMAND          DESCRIPTION\n";
     ccout << "-------          -----------\n";
@@ -298,7 +307,7 @@ void rewrite_todos(std::vector<std::string> buffer, bool local) {
 // apply the change.
 void complete_todo(unsigned int index, bool local) {
     auto todos = get_todos(local);
-    if(index > todos.size() - 1) {
+    if(todos.size() == 0 || index > todos.size() - 1) {
         ccout << "No item with index " << index << "." << std::endl;
     } else {
         todos[index][0] = 'O';
@@ -311,7 +320,7 @@ void complete_todo(unsigned int index, bool local) {
 // Deletes a todo and then calls rewrite_todos() to apply the change.
 void delete_todo(unsigned int index, bool local) {
     auto todos = get_todos(local);
-    if(index > todos.size() - 1) {
+    if(todos.size() == 0 || index > todos.size() - 1) {
         ccout << "No item with index " << index << "." << std::endl;
     } else {
         todos[index] = "";
@@ -380,7 +389,7 @@ void process_todos(std::queue<std::string>* command_list, bool local_mode) {
     } else 
     if(match_one_or_more(command, "add")) {
         if(command_list->empty()) {
-            ccout << "No todo message provided." << std::endl;
+            ccout << "No todo body provided." << std::endl;
         } else {
             write_todo(concat_remainder(command_list), local);
         }

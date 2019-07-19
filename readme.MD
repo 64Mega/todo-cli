@@ -29,6 +29,10 @@ Shorthand can be used for any command. For example:
 `todo g a My task message` to add a global entry.
 
 ## Changelog
+### Version 0.0.4
++ Unicode output now defaults to UTF-8 on Windows
++ Unicode enabled by default in Makefile
++ Fixed exception when running delete or complete ops on empty todo list
 ### Version 0.0.3
 + Refactored most output to utilize Unicode if necessary.
 + Compile-flag to use ✅ for completed tasks.
@@ -61,29 +65,20 @@ When rebuilding, run `make clean` followed by `make`.
 It _should_ work out-of-the-box on any system that can run standard C++/C code, it doesn't use anything fancy.
 
 Tested on:
- + Windows 10
+ + Windows 10 (ConEmu, Windows Terminal (Preview), VS Code Terminal)
  + Windows 10 (WSL, Ubuntu)
  + Manjaro Linux 17.1.11 (Arch Linux)
  + Mac OS High Sierra (10.13)
 
-## Enabling ✅ output for completed tasks
-In the Makefile, uncomment `-DUNICODEGLYPHS` to allow outputting `✅` instead of `[X]` for completed tasks.
+## Disabling Unicode Output
+If your terminal displays strange characters instead of the expected ✅ glyph when completing todos,
+it means your terminal either doesn't support Unicode or is using a font that doesn't include
+Unicode glyphs in this range.
 
-Note that this doesn't work out-of-the-box on many terminals, as it requires UTF-8/16 support as well as a font that contains the required codepage and character.
-
-Tested on:
-+ ConEmu (With UTF16 mode enabled)
-+ Visual Studio Code Terminal
-+ Hyper
-+ iTerm2 with Powerline fonts
-+ ZSH with Powerline fonts
-
-Your mileage may vary.
+You can comment out `-DUNICODEGLYPHS` in the Makefile and rebuild to enable compatible output.
 
 ## Code Notes
 The code is messy, this is the result of a spontaneous one-night self-challenge!
-
-I'll tidy it up a little in the future, and add more features (Like Console API/Escape Code usage for prettier output!), but for now this is what it is. 
 
 Feel free to fork it and mess around, or make a pull request if my mixing of old C library functions and C++ library classes is particularly odious to you.
 

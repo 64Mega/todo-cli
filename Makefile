@@ -1,15 +1,17 @@
 CC=g++
-LDFLAGS=
-CFLAGS=-std=c++14 -O3
+LDFLAGS=-static-libgcc -static-libstdc++
+CFLAGS=-std=gnu++14 -O3
 
 OUTPUT=todo
 
 SRCLIST=$(wildcard ./src/*.cpp)
 OBJLIST=$(patsubst ./src/%.cpp,./obj/%.o, $(SRCLIST))
 
-## Uncomment -DUNICODEGLYPHS to enable special unicode check marks for completed items
-## Be aware that this won't work out-of-the-box on all terminals.
-DEFS=#-DUNICODEGLYPHS
+## Define UNICODEGLYPHS to allow for output of ✅ instead of 
+## [X] for completed todos. 
+## If this doesn't work in your terminal of choice, removing the
+## definition will revert to the standard [X] completion box.
+DEFS=-DUNICODEGLYPHS
 
 $(OUTPUT): $(OBJLIST)
 	g++ $(LDFLAGS) -o $(OUTPUT) $(OBJLIST)
